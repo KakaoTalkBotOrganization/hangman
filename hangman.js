@@ -18,7 +18,7 @@ const create_game = () => {
   return {
     is_over: false,
     word: word,
-    failed_chars: [],
+    failed_letters: [],
     last_word: word.replace(/./g, '_'),
     man: '  \n  \n   \n   '.split('\n'),
     stroke_count: 0,
@@ -26,30 +26,30 @@ const create_game = () => {
   };
 };
 
-const guess_game = (game, alphabet) => {
-  const { word, last_word, failed_chars } = game;
+const guess_game = (game, letter) => {
+  const { word, last_word, failed_letters } = game;
   if (
-    last_word.indexOf(alphabet) != -1 ||
-    failed_chars.indexOf(alphabet) != -1
+    last_word.indexOf(letter) != -1 ||
+    failed_letters.indexOf(letter) != -1
   ) {
     game.last_message = '이미 사용된 글자입니다.';
     return;
   }
   let next_word = last_word;
   for (let i = 0; i < word.length; ++i) {
-    if (word[i] == alphabet) {
-      next_word = set_char_at(next_word, i, alphabet);
+    if (word[i] == letter) {
+      next_word = set_char_at(next_word, i, letter);
     }
   }
   if (last_word == next_word) {
-    failed_chars.push(alphabet);
-    failed_chars.sort();
+    failed_letters.push(letter);
+    failed_letters.sort();
     const [ch, x, y] = strokes[game.stroke_count++];
     game.man[y] = set_char_at(game.man[y], x, ch);
     game.last_message = '틀렸습니다!';
     if (game.stroke_count >= strokes.length) {
       game.is_over = true;
-      game.last_message = '실패!';
+      game.last_message = '실패! 정답은 ' + word + '였습니다.';
     }
   }
   else {
@@ -65,7 +65,7 @@ const guess_game = (game, alphabet) => {
 const render_game = game =>
   game.man.join('\n') + '\n' +
   game.last_message + '\n' +
-  '사용된 글자: ' + game.failed_chars.join('') + '\n' +
+  '없는 글자: ' + game.failed_letters.join('') + '\n' +
   game.last_word.replace(/./g, '$& ');
 
 const games = {};
